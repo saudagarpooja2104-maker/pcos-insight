@@ -1,0 +1,170 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Your dashboard | PCOS Insight</title>
+  <link rel="stylesheet" href="{% static 'health/site.css' %}">
+</head>
+<body class="dashboard-page">
+  {% include "health/_site_header.html" %}
+  <main>
+    <header class="dashboard-header">
+      <p class="eyebrow">Your private wellness space</p>
+      <h1>Welcome back. This is your space.</h1>
+      <p>Take a moment to check in with yourself. Add a note, review your records, or simply explore at your own pace.</p>
+      <p class="notice">This page helps you organise information. It does not diagnose PCOS or replace advice from a qualified healthcare professional.</p>
+      {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+    </header>
+
+    {% if profile.consent_to_health_data %}
+      <nav class="dashboard-shortcuts" aria-label="Dashboard shortcuts">
+        <a href="#record-cycle"><span aria-hidden="true">＋</span> Cycle entry</a>
+        <a href="#record-symptom"><span aria-hidden="true">＋</span> Symptom</a>
+        <a href="#record-lifestyle"><span aria-hidden="true">＋</span> Lifestyle note</a>
+        <a href="{% url 'cycle_calendar' %}">View calendar <span aria-hidden="true">↗</span></a>
+        <a href="{% url 'health_report' %}">Export report <span aria-hidden="true">↗</span></a>
+      </nav>
+    {% endif %}
+
+    {% if profile.consent_to_health_data %}
+      <section id="record-cycle">
+        <h2>Record a cycle</h2>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="cycle">{{ cycle_form.as_p }}<button type="submit">Save cycle entry</button></form>
+      </section>
+      <section id="record-symptom">
+        <h2>Record a symptom</h2>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="symptom">{{ symptom_form.as_p }}<button type="submit">Save symptom</button></form>
+      </section>
+      <section id="record-lifestyle">
+        <h2>Record a lifestyle note</h2>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="lifestyle">{{ lifestyle_form.as_p }}<button type="submit">Save lifestyle note</button></form>
+      </section>
+      <section>
+        <h2>Health-data consent</h2>
+        <p>You can stop adding new health information at any time. Turning consent off leaves your existing records in your account.</p>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="withdraw_consent"><button type="submit">Turn off health-data consent</button></form>
+      </section>
+    {% else %}
+      <section>
+        <h2>Health-data consent is off</h2>
+        <p>Your existing records remain in your account. To add new records, you must actively agree to store the health information you choose to enter.</p>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="restore_consent"><label><input type="checkbox" name="health_data_consent" required> I agree to store the health information I choose to record in my private account.</label><button type="submit">Agree and continue</button></form>
+      </section>
+    {% endif %}
+
+    <section>
+      <h2>Cycle intervals</h2>
+      <p>Days between the start dates you recorded. This chart describes your entries and does not assess or diagnose a condition.</p>
+      {% if cycle_intervals %}<div class="chart-wrap"><canvas id="cycle-chart" role="img" aria-label="Line chart of days between recorded period start dates. The underlying interval values are listed in the recent cycle entries below."></canvas></div>
+      {% else %}<p>Add at least two cycle start dates to see recorded intervals.</p>{% endif %}
+    </section>
+    <section>
+      <h2>Recent symptom severity</h2>
+      <p>Your six most recent severity values, on a scale from 1 to 5. The chart is for personal tracking only.</p>
+      {% if symptom_chart %}<div class="chart-wrap"><canvas id="symptom-chart" role="img" aria-label="Bar chart of recently recorded symptom severity values from 1 to 5. The underlying entries are listed below."></canvas></div>
+      {% else %}<p>Add a symptom entry to see it here.</p>{% endif %}
+    </section>
+
+    <section>
+      <h2>Personal record summary</h2>
+      <p>This section describes only the information you recorded. It does not apply clinical thresholds or estimate PCOS risk.</p>
+      <h3>Recorded cycle intervals</h3>
+      {% if cycle_interval_summary %}
+        <p>Across {{ cycle_interval_summary.count }} intervals from your recent cycle entries: average {{ cycle_interval_summary.average }} days; shortest {{ cycle_interval_summary.shortest }} days; longest {{ cycle_interval_summary.longest }} days.</p>
+      {% else %}<p>Add at least two cycle start dates to summarize recorded intervals.</p>{% endif %}
+      <h3>Symptoms recorded in the last 30 days</h3>
+      <p>From {{ symptom_summary_start }} through today. Average severity is the mean of your recorded 1–5 values for each symptom.</p>
+      {% for item in symptom_summary %}<p>{{ item.symptom }} · {{ item.count }} entr{{ item.count|pluralize:"y,ies" }} · average severity {{ item.average_severity|floatformat:1 }} of 5</p>{% empty %}<p>No symptom entries in this date range.</p>{% endfor %}
+    </section>
+
+    <section class="entries">
+      <h2>Recent cycle entries</h2>
+      {% for entry in cycle_entries %}<p>{{ entry.period_start }}{% if entry.period_end %} – {{ entry.period_end }}{% endif %} · {{ entry.get_flow_display|default:"Flow not recorded" }} · <a href="{% url 'edit_entry' 'cycle' entry.id %}">Edit</a> · <a href="{% url 'delete_entry' 'cycle' entry.id %}">Delete</a></p>{% empty %}<p>No cycle entries yet.</p>{% endfor %}
+    </section>
+    <section class="entries">
+      <h2>Recent symptoms</h2>
+      {% for entry in symptom_entries %}<p>{{ entry.recorded_on }} · {{ entry.symptom }} · severity {{ entry.severity }} of 5 · <a href="{% url 'edit_entry' 'symptom' entry.id %}">Edit</a> · <a href="{% url 'delete_entry' 'symptom' entry.id %}">Delete</a></p>{% empty %}<p>No symptom entries yet.</p>{% endfor %}
+    </section>
+    <section class="entries">
+      <h2>Recent lifestyle notes</h2>
+      {% for entry in lifestyle_entries %}<p>{{ entry.recorded_on }}{% if entry.sleep_hours %} · {{ entry.sleep_hours }} hours sleep{% endif %}{% if entry.activity_minutes %} · {{ entry.activity_minutes }} minutes activity{% endif %}{% if entry.mood %} · mood: {{ entry.get_mood_display }}{% endif %} · <a href="{% url 'edit_entry' 'lifestyle' entry.id %}">Edit</a> · <a href="{% url 'delete_entry' 'lifestyle' entry.id %}">Delete</a></p>{% empty %}<p>No lifestyle entries yet.</p>{% endfor %}
+    </section>
+    <section>
+      <h2>Monthly cycle calendar</h2>
+      <p>Review period dates you have recorded by month.</p>
+      <p><a href="{% url 'cycle_calendar' %}">Open cycle calendar</a></p>
+    </section>
+    <section>
+      <h2>Download a health report</h2>
+      <p>Create a private PDF of the entries you choose by date range.</p>
+      <p><a href="{% url 'health_report' %}">Choose dates and download your records as PDF or CSV</a></p>
+    </section>
+    <section>
+      <h2>Experimental ultrasound image preparation</h2>
+      <p>Upload a JPEG, PNG, or WebP image to view a contrast-normalized grayscale preview. This prototype does not identify follicles, classify PCOS, or provide a risk result.</p>
+      <p><a href="{% url 'ultrasound_intake' %}">Open ultrasound image preparation</a></p>
+    </section>
+    <section>
+      <h2>Delete your account</h2>
+      <p>Account deletion permanently removes your account and its health records from this prototype.</p>
+      <p><a href="{% url 'delete_account' %}">Review account deletion</a></p>
+    </section>
+  </main>
+  {% include "health/_site_footer.html" %}
+  {% if cycle_intervals or symptom_chart %}
+    {{ cycle_intervals|json_script:"cycle-interval-data" }}
+    {{ symptom_chart|json_script:"symptom-chart-data" }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <script>
+      const chartLine = "#236b66";
+      const chartGrid = "#d9e2e6";
+      const chartText = "#43515b";
+      const cycleData = JSON.parse(document.getElementById("cycle-interval-data").textContent);
+      const symptomData = JSON.parse(document.getElementById("symptom-chart-data").textContent);
+      const cycleCanvas = document.getElementById("cycle-chart");
+      const symptomCanvas = document.getElementById("symptom-chart");
+
+      if (cycleCanvas) {
+        new Chart(cycleCanvas, {
+          type: "line",
+          data: {
+            labels: cycleData.map((item) => item.label),
+            datasets: [{ label: "Days between starts", data: cycleData.map((item) => item.days), borderColor: chartLine, backgroundColor: chartLine, pointRadius: 4, tension: 0.2 }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (context) => `${context.parsed.y} days` } } },
+            scales: {
+              x: { title: { display: true, text: "Recorded start dates", color: chartText }, ticks: { color: chartText, maxRotation: 35, minRotation: 0 }, grid: { display: false } },
+              y: { beginAtZero: true, title: { display: true, text: "Days", color: chartText }, ticks: { color: chartText }, grid: { color: chartGrid } },
+            },
+          },
+        });
+      }
+
+      if (symptomCanvas) {
+        new Chart(symptomCanvas, {
+          type: "bar",
+          data: {
+            labels: symptomData.map((item) => item.label),
+            datasets: [{ label: "Recorded severity", data: symptomData.map((item) => item.severity), backgroundColor: chartLine, borderRadius: 3 }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (context) => `Severity ${context.parsed.y} of 5` } } },
+            scales: {
+              x: { title: { display: true, text: "Date · symptom", color: chartText }, ticks: { color: chartText, maxRotation: 40, minRotation: 0 }, grid: { display: false } },
+              y: { min: 0, max: 5, ticks: { stepSize: 1, color: chartText }, title: { display: true, text: "Severity (1–5)", color: chartText }, grid: { color: chartGrid } },
+            },
+          },
+        });
+      }
+    </script>
+  {% endif %}
+</body>
+</html>

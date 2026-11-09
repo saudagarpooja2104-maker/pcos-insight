@@ -1,0 +1,15 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f7f8f3"><title>Edit {{ label }} | PCOS Insight</title><link rel="stylesheet" href="{% static 'health/site.css' %}"></head>
+<body>
+  {% include "health/_site_header.html" %}
+  <main class="narrow-page">
+    <p><a href="{% url 'dashboard' %}">Back to dashboard</a></p>
+    <h1>Edit {{ label }}</h1>
+    <p>Only you can edit entries in your account.</p>
+    <form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">Save changes</button></form>
+  </main>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

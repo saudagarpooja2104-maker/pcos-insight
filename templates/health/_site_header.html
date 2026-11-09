@@ -1,0 +1,23 @@
+<header class="site-header">
+  <a class="site-brand" href="{% url 'home' %}" aria-label="PCOS Insight home">
+    <span class="brand-mark" aria-hidden="true">P</span>
+    <span>PCOS <strong>Insight</strong></span>
+  </a>
+  <nav class="site-nav" aria-label="Main navigation">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'home' %}#features">Features</a>
+    <a href="{% url 'home' %}#about">About</a>
+    <a href="{% url 'learning_hub' %}">Understanding PCOS</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'account_profile' %}">Profile</a>
+      <a href="{% url 'cycle_calendar' %}">Calendar</a>
+      <a href="{% url 'health_report' %}">Reports</a>
+      <a href="{% url 'ultrasound_intake' %}">Image prep</a>
+      <form method="post" action="{% url 'logout' %}" class="nav-signout">{% csrf_token %}<button type="submit">Sign out</button></form>
+    {% else %}
+      <a href="{% url 'login' %}">Sign in</a>
+      <a class="nav-cta" href="{% url 'register' %}">Create account</a>
+    {% endif %}
+  </nav>
+</header>

@@ -1,0 +1,28 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Create a PDF report | PCOS Insight</title>
+  <link rel="stylesheet" href="{% static 'health/site.css' %}">
+</head>
+<body class="form-page">
+  {% include "health/_site_header.html" %}
+  <p><a href="{% url 'dashboard' %}">← Back to dashboard</a></p>
+  <h1>Create a health report</h1>
+  <p class="notice">Download your cycle, symptom, and lifestyle entries within the selected dates. Exports are generated for your account and are not a diagnosis or risk estimate. Keep downloaded health information private.</p>
+  <section class="narrow-page">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="button-row">
+        <button type="submit" name="export_format" value="pdf">Download PDF</button>
+        <button type="submit" name="export_format" value="csv" class="button-secondary">Download CSV</button>
+      </div>
+    </form>
+  </section>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

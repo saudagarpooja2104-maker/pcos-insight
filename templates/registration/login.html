@@ -1,0 +1,18 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f7f8f3"><title>Sign in | PCOS Insight</title><link rel="stylesheet" href="{% static 'health/site.css' %}"></head>
+<body class="auth-page">
+  {% include "health/_site_header.html" %}
+  <main class="auth-layout">
+    <aside class="auth-aside"><div class="auth-flower" aria-hidden="true">✿</div><p class="eyebrow">Welcome to your space</p><h1>Check in with<br><em>yourself.</em></h1><p>Your notes and personal records stay together, ready when you need them.</p><small>Private personal tracking · Educational support</small></aside>
+    <section class="auth-form-card">
+      <p class="eyebrow">Your wellness space</p><h2>Welcome back</h2><p class="auth-intro">Sign in to continue with your personal records.</p>
+      {% if form.errors %}<p role="alert">The username or password was not recognised.</p>{% endif %}
+      <form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">Sign in <span aria-hidden="true">→</span></button></form>
+      <p class="auth-switch">New to PCOS Insight? <a href="{% url 'register' %}">Create an account</a></p>
+    </section>
+  </main>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

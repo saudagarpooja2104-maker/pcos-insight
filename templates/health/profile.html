@@ -1,0 +1,73 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Your profile | PCOS Insight</title>
+  <link rel="stylesheet" href="{% static 'health/site.css' %}">
+</head>
+<body>
+  {% include "health/_site_header.html" %}
+  <main class="profile-page">
+    <header class="profile-heading">
+      <p class="eyebrow">Account and data settings</p>
+      <h1>Your profile</h1>
+      <p>Review your account details, health-data consent, and information stored in your account.</p>
+      {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+    </header>
+
+    <section class="profile-card">
+      <h2>Account details</h2>
+      <dl class="profile-details">
+        <div><dt>Username</dt><dd>{{ user.username }}</dd></div>
+        <div><dt>Email</dt><dd>{{ user.email|default:"Not provided" }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="profile-card">
+      <h2>Optional profile information</h2>
+      <p>Date of birth is optional. It is stored only if you choose to provide it and is not used to diagnose PCOS or estimate risk.</p>
+      {% if profile.consent_to_health_data %}
+        <form method="post">
+          {% csrf_token %}<input type="hidden" name="action" value="save_profile">
+          {{ form.as_p }}
+          <button type="submit">Save profile</button>
+        </form>
+      {% else %}
+        <p>Turn on health-data consent below before adding optional health-profile details.</p>
+      {% endif %}
+    </section>
+
+    <section class="profile-card">
+      <h2>Health-data consent</h2>
+      {% if profile.consent_to_health_data %}
+        <p><span class="consent-status is-on">On</span> · Updated {{ profile.consent_updated_at|date:"d M Y"|default:"date unavailable" }}.</p>
+        <p>Turning consent off stops new health records and profile details from being saved. Existing records remain until you delete them.</p>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="withdraw_consent"><button class="button-secondary" type="submit">Turn off health-data consent</button></form>
+      {% else %}
+        <p><span class="consent-status is-off">Off</span> · New health entries and profile details are not saved while consent is off.</p>
+        <form method="post">
+          {% csrf_token %}<input type="hidden" name="action" value="restore_consent">
+          <label class="consent-label"><input type="checkbox" name="health_data_consent" required> I agree to store health information I choose to record in my private account.</label>
+          <button type="submit">Turn on health-data consent</button>
+        </form>
+      {% endif %}
+    </section>
+
+    <section class="profile-card">
+      <h2>Your stored records</h2>
+      <div class="profile-stats">
+        <div><strong>{{ cycle_count }}</strong><span>Cycle entries</span></div>
+        <div><strong>{{ symptom_count }}</strong><span>Symptom entries</span></div>
+        <div><strong>{{ lifestyle_count }}</strong><span>Lifestyle entries</span></div>
+        <div><strong>{{ ultrasound_count }}</strong><span>Ultrasound images</span></div>
+      </div>
+      <p><a href="{% url 'health_report' %}">Create a date-range report</a></p>
+      <p><a href="{% url 'delete_account' %}">Review account and record deletion</a></p>
+    </section>
+  </main>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

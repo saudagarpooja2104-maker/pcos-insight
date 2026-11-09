@@ -1,0 +1,63 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Ultrasound image preparation | PCOS Insight</title>
+  <link rel="stylesheet" href="{% static 'health/site.css' %}">
+</head>
+<body>
+  {% include "health/_site_header.html" %}
+  <main>
+    <header>
+      <p><a href="{% url 'dashboard' %}">← Back to dashboard</a></p>
+      <h1>Experimental ultrasound image preparation</h1>
+      <p class="warning"><strong>No diagnosis or AI analysis is provided.</strong> This page only validates an image and displays a grayscale, contrast-normalized preview. It does not detect follicles, classify PCOS, or estimate risk. An image by itself cannot establish PCOS.</p>
+      <p class="notice">Images are limited to JPEG, PNG, or WebP, 8 MB, and 20 megapixels. The stored copy is resized, converted to JPEG, and stripped of image metadata. It is private to your account; upload only an image you have permission to store.</p>
+      {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+    </header>
+
+    {% if profile.consent_to_health_data %}
+      <section>
+        <h2>Add an image</h2>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit">Store image and prepare preview</button>
+        </form>
+      </section>
+    {% else %}
+      <section>
+        <h2>Health-data consent is off</h2>
+        <p>Turn on health-data consent from your dashboard before storing a new image. You can still review or delete images already in your account.</p>
+      </section>
+    {% endif %}
+
+    <section>
+      <h2>Your stored images</h2>
+      {% for image in images %}
+        <article>
+          <h3>{% if image.study_date %}Study date: {{ image.study_date }}{% else %}Date not provided{% endif %}</h3>
+          <p>Uploaded {{ image.uploaded_at|date:"d M Y, H:i" }}. No classification or medical interpretation was performed.</p>
+          <div class="image-pair">
+            <figure>
+              <img src="{% url 'view_ultrasound_image' image.id %}" alt="Private normalized ultrasound image">
+              <figcaption>Stored image</figcaption>
+            </figure>
+            <figure>
+              <img src="{% url 'preprocess_ultrasound_image' image.id %}" alt="Grayscale ultrasound preview with contrast normalization">
+              <figcaption>Preparation preview: grayscale with contrast normalization</figcaption>
+            </figure>
+          </div>
+          <form method="post" action="{% url 'delete_ultrasound_image' image.id %}">{% csrf_token %}<button type="submit">Delete this image</button></form>
+        </article>
+      {% empty %}
+        <p>No ultrasound images are stored in your account.</p>
+      {% endfor %}
+    </section>
+  </main>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

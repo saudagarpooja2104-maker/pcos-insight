@@ -1,0 +1,54 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Cycle calendar | PCOS Insight</title>
+  <link rel="stylesheet" href="{% static 'health/site.css' %}">
+</head>
+<body class="calendar-page">
+  {% include "health/_site_header.html" %}
+  <p><a href="{% url 'dashboard' %}">← Back to dashboard</a></p>
+  <h1>Cycle calendar</h1>
+  <p class="notice">This calendar shows only period dates you recorded. It does not forecast future periods or interpret your cycle history.</p>
+
+  <section>
+    <nav aria-label="Calendar month navigation">
+      {% if previous_month %}<a href="?month={{ previous_month }}" aria-label="Previous month">← Previous</a>{% else %}<span></span>{% endif %}
+      <h2>{{ month_label }}</h2>
+      {% if next_month %}<a href="?month={{ next_month }}" aria-label="Next month">Next →</a>{% else %}<span></span>{% endif %}
+    </nav>
+    {% if current_month != month_start|date:"Y-m" %}<p><a href="?month={{ current_month }}">Return to this month</a></p>{% endif %}
+    <table>
+      <caption>Recorded period dates for {{ month_label }}</caption>
+      <thead><tr>{% for weekday in weekdays %}<th scope="col">{{ weekday|slice:":3" }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for week in weeks %}
+          <tr>
+            {% for cell in week %}
+              <td class="{% if not cell.in_month %}outside{% endif %}{% if cell.events %} recorded{% endif %}">
+                <span class="day">{{ cell.date.day }}</span>
+                {% for event in cell.events %}
+                  {% if event.is_start %}<span class="marker">Period start</span>{% endif %}
+                  {% if event.is_end %}<span class="marker">Period end</span>{% endif %}
+                  {% if not event.is_start and not event.is_end %}<span class="marker">Recorded period</span>{% endif %}
+                {% endfor %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="entries">
+    <h2>Entries overlapping this month</h2>
+    {% for entry in month_entries %}
+      <p>{{ entry.period_start }}{% if entry.period_end %} to {{ entry.period_end }}{% else %} · end date not recorded{% endif %} · {{ entry.get_flow_display|default:"Flow not recorded" }} · <a href="{% url 'edit_entry' 'cycle' entry.id %}">Edit</a> · <a href="{% url 'delete_entry' 'cycle' entry.id %}">Delete</a></p>
+    {% empty %}<p>No cycle entries overlap this month.</p>{% endfor %}
+  </section>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

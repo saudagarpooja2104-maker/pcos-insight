@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Create an account | PCOS Insight</title>
+  <link rel="stylesheet" href="{% static 'health/site.css' %}">
+</head>
+<body class="auth-page">
+  {% include "health/_site_header.html" %}
+  <main class="auth-layout">
+    <aside class="auth-aside"><div class="auth-flower" aria-hidden="true">✿</div><p class="eyebrow">A softer place to begin</p><h1>Your body.<br><em>Your journey.</em></h1><p>Make room for the notes and patterns that matter to you. Your health story is yours to explore, at your own pace.</p><small>Private personal tracking · Educational support</small></aside>
+    <section class="auth-form-card">
+      <p class="eyebrow">Create your private space</p><h2>Join PCOS Insight</h2>
+      <p class="auth-intro">Your account is for private health tracking. This educational prototype does not provide a diagnosis.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          <div>
+            {{ field.errors }}
+            {% if field.name == "health_data_consent" %}
+              <label class="auth-consent">{{ field }} <span>{{ field.label }}<small>Consent is needed to store the health entries you choose to record. You can turn it off later in your dashboard.</small></span></label>
+            {% else %}
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit">Create account <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="auth-switch">Already registered? <a href="{% url 'login' %}">Sign in</a></p>
+    </section>
+  </main>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

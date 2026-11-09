@@ -27,7 +27,7 @@ This code is still a prototype. Do not enter real patient information or use it 
 
 `render.yaml` describes a Render web service, managed PostgreSQL database, and a dedicated persistent volume for private uploads. It uses paid service, database, and storage plans so accounts and uploaded files can persist. Review the exact current estimate in Render before applying the Blueprint. As of the 2026-11-09 review, Render lists the small web plan at $7/month, the small PostgreSQL plan at $6/month, and persistent disks at $0.25/GB-month; database storage and bandwidth can add charges. The free PostgreSQL plan expires after 30 days and is not configured here. See [Render pricing](https://render.com/pricing) and [Render's disk policy](https://render.com/docs/disks).
 
-To deploy, push this project to a private GitHub repository, connect that repository to Render, and create a new Blueprint Instance from `render.yaml`. Do not include `.env`, local SQLite databases, or media files. Review the generated service and database costs before applying. Do not deploy real patient information or use this prototype for clinical decisions.
+To deploy this public demo, push the source to GitHub, connect the repository to Render, and create a new Blueprint Instance from `render.yaml`. The public repository contains source code only: do not commit `.env`, local SQLite databases, or media files. Review the generated service and database costs before applying. Do not deploy real patient information or use this prototype for clinical decisions.
 
 Ultrasound image files are stored under `private_media/` and are served only through authenticated, owner-scoped views. Do not expose that directory through a web server, static-file mapping, or public media URL. Set upload-size limits at the reverse proxy or web server as well as in the form.
 
@@ -41,4 +41,3 @@ Health data is sensitive. The initial implementation requires authentication for
 2. Build the documented preprocessing and classifier-comparison pipeline only if the dataset meets the synopsis requirements.
 3. Resolve the ultrasound dataset question before considering any learned classification or follicle detection.
 4. Add project-specific recorded checks and resolve setup issues before demonstration.
-

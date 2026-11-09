@@ -1,0 +1,61 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Learn about PCOS | PCOS Insight</title>
+  <link rel="stylesheet" href="{% static 'health/site.css' %}">
+</head>
+<body>
+  {% include "health/_site_header.html" %}
+  <main class="learn-page">
+    <section class="learn-hero">
+      <p class="eyebrow">A short, evidence-based guide</p>
+      <h1>PCOS, explained clearly.</h1>
+      <p class="hero-copy">Polycystic ovary syndrome can affect people in different ways. This page offers general background to help you understand the condition and prepare questions for a healthcare professional.</p>
+      <p class="learn-updated">Sources checked 9 November 2026 · WHO and the 2023 international evidence-based guideline</p>
+    </section>
+
+    <div class="learning-grid">
+      <article class="learn-card">
+        <span class="learn-number">01 · THE BASICS</span>
+        <h2>What is PCOS?</h2>
+        <p>PCOS is a hormonal condition that can affect menstrual cycles and ovulation. It is also associated with changes in androgen hormones and metabolic health. Its causes are not fully understood.</p>
+      </article>
+      <article class="learn-card">
+        <span class="learn-number">02 · EXPERIENCES VARY</span>
+        <h2>Signs can look different</h2>
+        <p>Some people notice irregular or infrequent periods, acne or oily skin, excess facial or body hair, or scalp hair thinning. Symptoms can differ and may change over time. These signs can also have other causes.</p>
+      </article>
+      <article class="learn-card">
+        <span class="learn-number">03 · PROFESSIONAL ASSESSMENT</span>
+        <h2>How is it assessed?</h2>
+        <p>There is no single symptom or app result that confirms PCOS. A healthcare professional considers a person’s history and symptoms, may use blood tests or imaging, and checks for other possible causes. Age and life stage matter.</p>
+      </article>
+      <article class="learn-card learn-card-accent">
+        <span class="learn-number">04 · ABOUT ULTRASOUND</span>
+        <h2>An image alone cannot diagnose PCOS</h2>
+        <p>Ultrasound can be one part of an adult assessment, but it is not a stand-alone diagnosis. Some people with PCOS do not have polycystic-appearing ovaries. The international guideline uses different assessment considerations for adolescents.</p>
+      </article>
+    </div>
+
+    <section class="learn-callout">
+      <h2>Keeping a useful record</h2>
+      <p>Dates and notes you choose to record can help you describe what you have noticed during a healthcare conversation. PCOS Insight only organizes those entries; its charts and summaries do not interpret your health.</p>
+      <p>If changes in your periods, skin or hair are concerning to you, consider discussing them with a qualified healthcare professional. You can bring a copy of your records if that would be helpful.</p>
+    </section>
+
+    <section class="learn-sources">
+      <h2>Sources and further reading</h2>
+      <ol>
+        <li><a href="https://www.who.int/news-room/fact-sheets/detail/polycystic-ovary-syndrome" target="_blank" rel="noopener noreferrer">World Health Organization · Polycystic ovary syndrome fact sheet</a> <span>Updated 22 January 2026.</span></li>
+        <li><a href="https://www.monash.edu/__data/assets/pdf_file/0003/3379521/Evidence-Based-Guidelines-2023.pdf" target="_blank" rel="noopener noreferrer">International Evidence-based Guideline for the Assessment and Management of PCOS</a> <span>2023 guideline, led by Monash University with international partners.</span></li>
+      </ol>
+      <p class="trust-note">This educational page is not personal medical advice. It does not diagnose or recommend treatment.</p>
+    </section>
+  </main>
+  {% include "health/_site_footer.html" %}
+</body>
+</html>

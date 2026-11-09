@@ -1,0 +1,41 @@
+# Render Blueprint for a small public demo.
+# Applying this Blueprint provisions paid resources; review Render's dashboard
+# pricing before clicking Apply. Do not use it for real patient information.
+services:
+  - type: web
+    name: pcos-insight-demo
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
+    startCommand: python manage.py migrate && python -m gunicorn pcos_insight.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pcos-insight-db
+          property: connectionString
+      - key: DJANGO_ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: pcos-insight-demo
+          property: host
+      - key: PRIVATE_MEDIA_ROOT
+        value: /var/data/private_media
+    disk:
+      name: pcos-insight-private-uploads
+      mountPath: /var/data
+      sizeGB: 1
+
+databases:
+  - name: pcos-insight-db
+    plan: 0.1c-256mb
+    databaseName: pcos_insight
+    user: pcos_insight
+    diskSizeGB: 1
+    ipAllowList: []
